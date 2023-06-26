@@ -56,7 +56,11 @@ class Container implements ContainerInterface
         return $reflectionClass->newInstanceArgs($newInstanceParams);
     }
 
-    public function set(string $abstract, callable $resolver)
+    public function set(string $abstract, mixed $concrete): void
+    {
+    }
+
+    public function register(string $abstract): Definition
     {
     }
 }
