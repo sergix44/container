@@ -15,6 +15,11 @@
       "SergiX44\\Container\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "SergiX44\\Container\\Tests\\": "tests/"
+    }
+  },
   "authors": [
     {
       "name": "Sergio Brighenti",
