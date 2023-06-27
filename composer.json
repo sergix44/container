@@ -9,7 +9,8 @@
   },
   "require-dev": {
     "pestphp/pest": "^2.0",
-    "php-di/php-di": "^7.0"
+    "php-di/php-di": "^7.0",
+    "vimeo/psalm": "^5.13"
   },
   "license": "MIT",
   "autoload": {

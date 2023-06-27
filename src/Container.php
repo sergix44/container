@@ -79,8 +79,8 @@ class Container implements ContainerInterface
     }
 
     /**
-     * @param  string  $class
-     * @return object|string|null
+     * @param string  $class
+     *
      * @throws ContainerException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface

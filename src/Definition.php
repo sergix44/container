@@ -18,7 +18,7 @@ class Definition
     ) {
     }
 
-    public function singleton(): self
+    public function singleton(): static
     {
         $this->shared = true;
         return $this;
@@ -29,7 +29,7 @@ class Definition
         return $this->instance !== null;
     }
 
-    public function getInstance(): object
+    public function getInstance(): object|null
     {
         return $this->instance;
     }
