@@ -8,7 +8,6 @@ use SergiX44\Container\Exception\ContainerException;
 class Definition
 {
     private bool $shared = false;
-    private array $arguments = [];
 
     public function __construct(
         public readonly string $id,
@@ -23,12 +22,6 @@ class Definition
         return $this;
     }
 
-    public function argument(string $name, mixed $value): self
-    {
-        $this->arguments['name'] = $value;
-        return $this;
-    }
-
     public function hasInstance(): bool
     {
         return $this->instance !== null;
@@ -37,11 +30,6 @@ class Definition
     public function getInstance(): object
     {
         return $this->instance;
-    }
-
-    public function matches(string $id): bool
-    {
-        return $this->id === $id;
     }
 
     public function make(ContainerInterface $container): mixed
@@ -57,8 +45,7 @@ class Definition
             $resolved = ($this->resolver)($container);
         }
 
-        // if is a string (class concrete)  and can be resolved via container
-        // lets try
+        // if is a string (class concrete) and can be resolved via container
         if (is_string($resolved) && $container->has($resolved)) {
             $resolved = $container->get($resolved);
         }

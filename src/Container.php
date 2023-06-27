@@ -46,11 +46,6 @@ class Container implements ContainerInterface
             return true;
         }
 
-        // check if is a registered definition
-        if ($this->getDefinition($id) !== null) {
-            return true;
-        }
-
         // if is not registered, check if the class exists
         return class_exists($id) && !enum_exists($id);
     }
@@ -72,13 +67,7 @@ class Container implements ContainerInterface
 
     private function resolve(string $id): object
     {
-        $definition = $this->definitions[$id] ?? $this->getDefinition($id);
-
-        if ($definition !== null) {
-            return $definition->make($this);
-        }
-
-        return $this->reflectionInstance($id);
+        return $this->definitions[$id]?->make($this) ?? $this->reflectionInstance($id);
     }
 
     /**
@@ -105,16 +94,5 @@ class Container implements ContainerInterface
         }
 
         return $reflectionClass->newInstanceArgs($newInstanceParams);
-    }
-
-    private function getDefinition(string $id): ?Definition
-    {
-        foreach ($this->definitions as $d) {
-            if ($d->matches($id)) {
-                return $d;
-            }
-        }
-
-        return null;
     }
 }
