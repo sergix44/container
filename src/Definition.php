@@ -2,7 +2,9 @@
 
 namespace SergiX44\Container;
 
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use SergiX44\Container\Exception\ContainerException;
 
 class Definition
@@ -11,7 +13,7 @@ class Definition
 
     public function __construct(
         public readonly string $id,
-        private mixed $resolver = null,
+        private readonly mixed $resolver = null,
         private ?object $instance = null
     ) {
     }
@@ -32,6 +34,11 @@ class Definition
         return $this->instance;
     }
 
+    /**
+     * @throws ContainerException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function make(ContainerInterface $container): mixed
     {
         if ($this->hasInstance()) {
