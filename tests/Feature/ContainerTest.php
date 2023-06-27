@@ -3,6 +3,8 @@
 use Psr\Container\ContainerInterface;
 use SergiX44\Container\Container;
 use SergiX44\Container\Exception\NotFoundException;
+use SergiX44\Container\Tests\Fixtures\MoreNestedClass;
+use SergiX44\Container\Tests\Fixtures\NestedClass;
 use SergiX44\Container\Tests\Fixtures\ResolvableClassWithDefault;
 use SergiX44\Container\Tests\Fixtures\SimpleClass;
 use SergiX44\Container\Tests\Fixtures\SimpleClassWithConstructor;
@@ -23,6 +25,19 @@ it('can resolve a simple definition', function () {
     $container->register(SimpleInterface::class, SimpleClass::class);
 
     expect($container->get(SimpleInterface::class))->toBeInstanceOf(SimpleClass::class);
+});
+
+it('can resolve a nested class definition', function () {
+    $container = new Container();
+
+    $container->register(SimpleInterface::class, SimpleClass::class);
+
+    $instance = $container->get(NestedClass::class);
+
+    expect($instance)->toBeInstanceOf(NestedClass::class)
+        ->and($instance->simple)->toBeInstanceOf(SimpleClass::class)
+        ->and($instance->more)->toBeInstanceOf(MoreNestedClass::class)
+        ->and($instance->more->r)->toBeInstanceOf(ResolvableClassWithDefault::class);
 });
 
 it('can resolve a definition with constructor', function () {

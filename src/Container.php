@@ -6,6 +6,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
+use ReflectionException;
 use SergiX44\Container\Exception\ContainerException;
 use SergiX44\Container\Exception\NotFoundException;
 use Throwable;
@@ -83,7 +84,7 @@ class Container implements ContainerInterface
      * @throws ContainerException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     private function resolve(string $class): object|string|null
     {
@@ -100,8 +101,9 @@ class Container implements ContainerInterface
         foreach ($constructorParams as $param) {
             $type = $param->getType()?->getName();
             $newInstanceParams[] = match (true) {
-                $type !== null && $this->has($type) => $this->get($type),
+                $type !== null && $this->has($type) => $this->get($type), // via definitions
                 $param->isOptional() => $param->getDefaultValue(), // use default when available
+                $type !== null && class_exists($type) && !enum_exists($type) => $this->resolve($type), // via reflection
                 default => throw new ContainerException("Cannot resolve constructor parameter '\${$param->getName()}::{$param->getDeclaringClass()?->getName()}'"),
             };
         }
