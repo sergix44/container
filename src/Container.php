@@ -4,6 +4,7 @@ namespace SergiX44\Container;
 
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
+use SergiX44\Container\Exception\ContainerException;
 use SergiX44\Container\Exception\NotFoundException;
 
 class Container implements ContainerInterface
@@ -16,6 +17,11 @@ class Container implements ContainerInterface
     private ?ContainerInterface $delegate = null;
 
     /**
+     * @template T
+     * @param  class-string<T>  $id
+     *
+     * @return T
+     *
      * @inheritDoc
      */
     public function get(string $id)
@@ -28,7 +34,7 @@ class Container implements ContainerInterface
             return $this->resolve($id);
         }
 
-        throw new NotFoundException();
+        throw new NotFoundException("Cannot find a definition resolver for $id");
     }
 
     /**
@@ -67,11 +73,15 @@ class Container implements ContainerInterface
 
     private function resolve(string $id): object
     {
-        return $this->definitions[$id]?->make($this) ?? $this->reflectionInstance($id);
+        if (array_key_exists($id, $this->definitions)) {
+            return $this->definitions[$id]?->make($this);
+        }
+
+        return $this->reflectionInstance($id);
     }
 
     /**
-     * @throws \ReflectionException
+     * @throws \ReflectionException|ContainerException
      */
     private function reflectionInstance(string $class)
     {
@@ -86,11 +96,11 @@ class Container implements ContainerInterface
 
         $newInstanceParams = [];
         foreach ($constructorParams as $param) {
-            if ($param->getType() === null) {
-                $newInstanceParams[] = $param->getDefaultValue();
-            } else {
-                $newInstanceParams[] = $this->resolve($param->getType()->getName());
-            }
+            $newInstanceParams[] = match (true) {
+                $param->isOptional() => $param->getDefaultValue(),
+                $param->hasType() && $this->has($param->getType()->getName()) => $this->resolve($param->getType()->getName()),
+                default => throw new ContainerException("Cannot resolve constructor parameter \${$param->getName()}::{$param->getDeclaringClass()?->getName()}"),
+            };
         }
 
         return $reflectionClass->newInstanceArgs($newInstanceParams);
