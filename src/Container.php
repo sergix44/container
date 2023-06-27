@@ -2,10 +2,13 @@
 
 namespace SergiX44\Container;
 
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
 use SergiX44\Container\Exception\ContainerException;
 use SergiX44\Container\Exception\NotFoundException;
+use Throwable;
 
 class Container implements ContainerInterface
 {
@@ -30,11 +33,15 @@ class Container implements ContainerInterface
             return $this->delegate->get($id);
         }
 
-        if ($this->has($id)) {
-            return $this->resolve($id);
+        if (array_key_exists($id, $this->definitions)) {
+            return $this->definitions[$id]?->make($this);
         }
 
-        throw new NotFoundException("Cannot find a definition resolver for $id");
+        try {
+            return $this->resolve($id);
+        } catch (Throwable $e) {
+            throw new NotFoundException("Cannot resolve '$id'", previous: $e);
+        }
     }
 
     /**
@@ -52,8 +59,7 @@ class Container implements ContainerInterface
             return true;
         }
 
-        // if is not registered, check if the class exists
-        return class_exists($id) && !enum_exists($id);
+        return false;
     }
 
     public function register(string $abstract, mixed $resolverOrConcrete): Definition
@@ -71,19 +77,15 @@ class Container implements ContainerInterface
         $this->delegate = $container;
     }
 
-    private function resolve(string $id): object
-    {
-        if (array_key_exists($id, $this->definitions)) {
-            return $this->definitions[$id]?->make($this);
-        }
-
-        return $this->reflectionInstance($id);
-    }
-
     /**
-     * @throws \ReflectionException|ContainerException
+     * @param  string  $class
+     * @return object|string|null
+     * @throws ContainerException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws \ReflectionException
      */
-    private function reflectionInstance(string $class)
+    private function resolve(string $class): object|string|null
     {
         $reflectionClass = new ReflectionClass($class);
 
@@ -96,10 +98,11 @@ class Container implements ContainerInterface
 
         $newInstanceParams = [];
         foreach ($constructorParams as $param) {
+            $type = $param->getType()?->getName();
             $newInstanceParams[] = match (true) {
-                $param->isOptional() => $param->getDefaultValue(),
-                $param->hasType() && $this->has($param->getType()->getName()) => $this->resolve($param->getType()->getName()),
-                default => throw new ContainerException("Cannot resolve constructor parameter \${$param->getName()}::{$param->getDeclaringClass()?->getName()}"),
+                $type !== null && $this->has($type) => $this->get($type),
+                $param->isOptional() => $param->getDefaultValue(), // use default when available
+                default => throw new ContainerException("Cannot resolve constructor parameter '\${$param->getName()}::{$param->getDeclaringClass()?->getName()}'"),
             };
         }
 

@@ -46,12 +46,12 @@ class Definition
         }
 
         // if is a string (class concrete) and can be resolved via container
-        if (is_string($resolved) && $container->has($resolved)) {
+        if (is_string($resolved) && class_exists($resolved) && !enum_exists($resolved)) {
             $resolved = $container->get($resolved);
         }
 
         if ($resolved === null) {
-            throw new ContainerException("Cannot resolve definition with id: $this->id");
+            throw new ContainerException("Cannot resolve definition '$this->id'");
         }
 
         if ($this->shared) {
