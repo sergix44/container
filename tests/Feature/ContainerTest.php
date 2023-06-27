@@ -11,3 +11,11 @@ it('can register a simple definition', function () {
 
     expect($container->has(MyInterface::class))->toBeTrue();
 });
+
+it('can resolve a simple definition', function () {
+    $container = new Container();
+
+    $container->register(MyInterface::class, MyClass::class);
+
+    expect($container->get(MyInterface::class))->toBeInstanceOf(MyClass::class);
+});
