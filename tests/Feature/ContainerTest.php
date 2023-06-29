@@ -176,3 +176,22 @@ it('can resolve a simple definition via himself as delegator', function () {
     expect($container->has(SimpleInterface::class))->toBeTrue()
         ->and($container->get(SimpleInterface::class))->toBeInstanceOf(SimpleClass::class);
 });
+
+
+it('support abstract as string', function () {
+    $container = new Container();
+
+    $container->register('simple', SimpleClass::class);
+
+    expect($container->get('simple'))->toBeInstanceOf(SimpleClass::class);
+});
+
+it('support set as string', function () {
+    $container = new Container();
+
+    $i = new stdClass();
+
+    $container->set('simple', $i);
+
+    expect($container->get('simple'))->toBe($i);
+});
