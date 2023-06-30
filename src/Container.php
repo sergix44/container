@@ -155,14 +155,14 @@ class Container implements ContainerInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
-    public function getArguments(array $parameters, $additional = []): array
+    protected function getArguments(array $parameters, $additional = []): array
     {
         $positionalArgs = array_filter($additional, 'is_numeric', ARRAY_FILTER_USE_KEY);
         return array_map(function (ReflectionParameter $param) use (&$additional, &$positionalArgs) {
             $type = $param->getType()?->getName();
             return match (true) {
                 $type !== null && $this->has($type) => $this->get($type), // via definitions
-                array_key_exists($param->getName(), $additional) => $additional[$param->getName()],
+                array_key_exists($param->getName(), $additional) => $additional[$param->getName()], // defined by the user
                 !empty($positionalArgs) => array_shift($positionalArgs),
                 $param->isOptional() => $param->getDefaultValue(), // use default when available
                 $type !== null && class_exists($type) && !enum_exists($type) => $this->resolve($type), // via reflection
