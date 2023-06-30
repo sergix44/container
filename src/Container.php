@@ -22,7 +22,8 @@ class Container implements ContainerInterface
 
     /**
      * @template T
-     * @param  class-string<T>  $id
+     *
+     * @param class-string<T> $id
      *
      * @return T
      *
@@ -79,7 +80,7 @@ class Container implements ContainerInterface
     }
 
     /**
-     * @param string  $class
+     * @param string $class
      *
      * @throws ContainerException
      * @throws ContainerExceptionInterface
@@ -101,10 +102,10 @@ class Container implements ContainerInterface
         foreach ($constructorParams as $param) {
             $type = $param->getType()?->getName();
             $newInstanceParams[] = match (true) {
-                $type !== null && $this->has($type) => $this->get($type), // via definitions
-                $param->isOptional() => $param->getDefaultValue(), // use default when available
+                $type !== null && $this->has($type)                          => $this->get($type), // via definitions
+                $param->isOptional()                                         => $param->getDefaultValue(), // use default when available
                 $type !== null && class_exists($type) && !enum_exists($type) => $this->resolve($type), // via reflection
-                default => throw new ContainerException("Cannot resolve constructor parameter '\${$param->getName()}::{$param->getDeclaringClass()?->getName()}'"),
+                default                                                      => throw new ContainerException("Cannot resolve constructor parameter '\${$param->getName()}::{$param->getDeclaringClass()?->getName()}'"),
             };
         }
 
