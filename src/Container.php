@@ -24,10 +24,15 @@ class Container implements ContainerInterface
 
     protected ?ContainerInterface $delegate = null;
 
+    public function __construct()
+    {
+        $this->set(ContainerInterface::class, $this);
+    }
+
     /**
      * @template T
      *
-     * @param  class-string<T>  $id
+     * @param class-string<T> $id
      * @return T
      *
      * @inheritDoc
@@ -107,13 +112,14 @@ class Container implements ContainerInterface
         } elseif ($callable instanceof Closure || (is_string($callable) && function_exists($callable))) {
             // handles closures and plain functions
             $method = new ReflectionFunction($callable);
-        } elseif (is_string($callable) && class_exists($callable)) {
+        } elseif (is_callable($callable) || (is_string($callable) && class_exists($callable))) {
             // handles class-string case
-            $callable = $this->get($callable);
-        }
-
-        if (is_object($callable) && method_exists($callable, '__invoke')) {
-            $method = new ReflectionMethod($callable, '__invoke');
+            if (is_string($callable) && class_exists($callable)) {
+                $callable = $this->get($callable);
+            }
+            if (method_exists($callable, '__invoke')) {
+                $method = new ReflectionMethod($callable, '__invoke');
+            }
         }
 
         if ($method === null) {
@@ -126,7 +132,7 @@ class Container implements ContainerInterface
     }
 
     /**
-     * @param  string  $class
+     * @param string $class
      * @return object|string|null
      *
      * @throws ContainerException
@@ -149,7 +155,7 @@ class Container implements ContainerInterface
     }
 
     /**
-     * @param  ReflectionParameter[]  $parameters
+     * @param ReflectionParameter[] $parameters
      * @return array|null[]|object[]|string[]
      *
      * @throws ContainerException
@@ -166,7 +172,8 @@ class Container implements ContainerInterface
 
             return match (true) {
                 $type !== null && $this->has($type) => $this->get($type), // via definitions
-                array_key_exists($param->getName(), $additional) => $additional[$param->getName()], // defined by the user
+                array_key_exists($param->getName(),
+                    $additional) => $additional[$param->getName()], // defined by the user
                 !empty($positionalArgs) => array_shift($positionalArgs),
                 $param->isOptional() => $param->getDefaultValue(), // use default when available
                 $type !== null && class_exists($type) && !enum_exists($type) => $this->resolve($type), // via reflection

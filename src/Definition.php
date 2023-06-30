@@ -25,36 +25,30 @@ class Definition
         return $this;
     }
 
-    public function hasInstance(): bool
-    {
-        return $this->instance !== null;
-    }
-
-    public function getInstance(): object|null
-    {
-        return $this->instance;
-    }
-
     /**
      * @throws ContainerException
      * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws NotFoundExceptionInterface|\ReflectionException
      */
     public function make(ContainerInterface $container): mixed
     {
-        if ($this->hasInstance()) {
-            return $this->getInstance();
+        if ($this->instance !== null) {
+            return $this->instance;
         }
 
         $resolved = $this->resolver;
 
-        if (is_callable($this->resolver)) {
-            // resolve the callable, if the resolver is a callable
-            $resolved = ($this->resolver)($container);
-        } elseif (is_string($resolved) && class_exists($resolved) && !enum_exists($resolved)) {
-            // if is a string (class concrete) and can be resolved via container
+        // resolve the callable, if the resolver is a callable
+        if (is_callable($resolved)) {
+            $resolved = call_user_func($resolved, $container);
+        }
+
+        // if is a string (class concrete) and can be resolved via container
+        if (is_string($resolved) && class_exists($resolved) && !enum_exists($resolved)) {
             $resolved = $container->get($resolved);
-        } else {
+        }
+
+        if (!is_object($resolved)) {
             throw ContainerException::invalidDefinition($this->id);
         }
 
