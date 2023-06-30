@@ -8,4 +8,8 @@ use Throwable;
 
 class NotFoundException extends Exception implements NotFoundExceptionInterface
 {
+    public static function notResolvable(string $id, Throwable $e): NotFoundException
+    {
+        return new self("Cannot resolve '$id'", previous: $e);
+    }
 }
