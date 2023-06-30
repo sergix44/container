@@ -26,7 +26,8 @@ class Container implements ContainerInterface
 
     /**
      * @template T
-     * @param  class-string<T>  $id
+     *
+     * @param class-string<T> $id
      *
      * @return T
      *
@@ -121,17 +122,19 @@ class Container implements ContainerInterface
         }
 
         $args = $this->getArguments($method->getParameters(), $arguments);
+
         return call_user_func_array($callable, $args);
     }
 
     /**
-     * @param  string  $class
+     * @param string $class
      *
-     * @return object|string|null
      * @throws ContainerException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
+     *
+     * @return object|string|null
      */
     protected function resolve(string $class): object|string|null
     {
@@ -148,25 +151,29 @@ class Container implements ContainerInterface
     }
 
     /**
-     * @param  ReflectionParameter[]  $parameters
-     * @return array|null[]|object[]|string[]
+     * @param ReflectionParameter[] $parameters
+     *
      * @throws ContainerException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
+     *
+     * @return array|null[]|object[]|string[]
      */
     protected function getArguments(array $parameters, $additional = []): array
     {
         $positionalArgs = array_filter($additional, 'is_numeric', ARRAY_FILTER_USE_KEY);
+
         return array_map(function (ReflectionParameter $param) use (&$additional, &$positionalArgs) {
             $type = $param->getType()?->getName();
+
             return match (true) {
-                $type !== null && $this->has($type) => $this->get($type), // via definitions
-                array_key_exists($param->getName(), $additional) => $additional[$param->getName()], // defined by the user
-                !empty($positionalArgs) => array_shift($positionalArgs),
-                $param->isOptional() => $param->getDefaultValue(), // use default when available
+                $type !== null && $this->has($type)                          => $this->get($type), // via definitions
+                array_key_exists($param->getName(), $additional)             => $additional[$param->getName()], // defined by the user
+                !empty($positionalArgs)                                      => array_shift($positionalArgs),
+                $param->isOptional()                                         => $param->getDefaultValue(), // use default when available
                 $type !== null && class_exists($type) && !enum_exists($type) => $this->resolve($type), // via reflection
-                default => throw ContainerException::parameterNotResolvable($param),
+                default                                                      => throw ContainerException::parameterNotResolvable($param),
             };
         }, $parameters);
     }

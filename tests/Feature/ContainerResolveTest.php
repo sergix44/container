@@ -77,7 +77,7 @@ it('throws error with an invalid definition', function () {
 
     $container->bind(SimpleInterface::class, 'stuff');
 
-   $container->get(SimpleInterface::class);
+    $container->get(SimpleInterface::class);
 })->expectException(ContainerException::class);
 
 it('throws error with unregistered definitions', function () {
