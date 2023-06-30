@@ -21,6 +21,7 @@ class Definition
     public function singleton(): static
     {
         $this->shared = true;
+
         return $this;
     }
 
@@ -67,5 +68,4 @@ class Definition
 
         return $resolved;
     }
-
 }
