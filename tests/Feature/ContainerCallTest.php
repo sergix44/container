@@ -7,7 +7,6 @@ use SergiX44\Container\Tests\Fixtures\Call\InvokableClass;
 use SergiX44\Container\Tests\Fixtures\Resolve\SimpleClass;
 use SergiX44\Container\Tests\Fixtures\Resolve\SimpleInterface;
 
-
 it('can call a closure without args', function () {
     $container = new Container();
 
@@ -44,8 +43,8 @@ it('can resolve a call a closure with arguments and arbitrary args', function ()
     $result = $container->call($f, [123]);
 
     expect($result)->sequence(
-        fn($e) => $e->toBeInstanceOf(SimpleClass::class),
-        fn($e) => $e->toBe(123),
+        fn ($e) => $e->toBeInstanceOf(SimpleClass::class),
+        fn ($e) => $e->toBe(123),
     );
 });
 
@@ -64,10 +63,10 @@ it('can resolve a call a closure with arguments and keyvalue args', function () 
     ]);
 
     expect($result)->sequence(
-        fn($e) => $e->toBeInstanceOf(SimpleClass::class),
-        fn($e) => $e->toBe(123),
-        fn($e) => $e->toBe('hi'),
-        fn($e) => $e->toBe('zzzz'),
+        fn ($e) => $e->toBeInstanceOf(SimpleClass::class),
+        fn ($e) => $e->toBe(123),
+        fn ($e) => $e->toBe('hi'),
+        fn ($e) => $e->toBe('zzzz'),
     );
 });
 
@@ -86,13 +85,12 @@ it('can resolve a call a closure with mixed positional and keyvalue', function (
     ]);
 
     expect($result)->sequence(
-        fn($e) => $e->toBeInstanceOf(SimpleClass::class),
-        fn($e) => $e->toBe(123),
-        fn($e) => $e->toBe('hi'),
-        fn($e) => $e->toBe('zzzz'),
+        fn ($e) => $e->toBeInstanceOf(SimpleClass::class),
+        fn ($e) => $e->toBe(123),
+        fn ($e) => $e->toBe('hi'),
+        fn ($e) => $e->toBe('zzzz'),
     );
 });
-
 
 it('can resolve a call an invokable class with arguments and keyvalue args as class-string', function () {
     $container = new Container();
@@ -105,10 +103,10 @@ it('can resolve a call an invokable class with arguments and keyvalue args as cl
     ]);
 
     expect($result)->sequence(
-        fn($e) => $e->toBeInstanceOf(SimpleClass::class),
-        fn($e) => $e->toBe(123),
-        fn($e) => $e->toBe('hi'),
-        fn($e) => $e->toBe('zzzz'),
+        fn ($e) => $e->toBeInstanceOf(SimpleClass::class),
+        fn ($e) => $e->toBe(123),
+        fn ($e) => $e->toBe('hi'),
+        fn ($e) => $e->toBe('zzzz'),
     );
 });
 
@@ -124,10 +122,10 @@ it('can resolve a call an invokable class with arguments and keyvalue args as ob
     ]);
 
     expect($result)->sequence(
-        fn($e) => $e->toBeInstanceOf(SimpleClass::class),
-        fn($e) => $e->toBe(123),
-        fn($e) => $e->toBe('hi'),
-        fn($e) => $e->toBe('zzzz'),
+        fn ($e) => $e->toBeInstanceOf(SimpleClass::class),
+        fn ($e) => $e->toBe(123),
+        fn ($e) => $e->toBe('hi'),
+        fn ($e) => $e->toBe('zzzz'),
     );
 });
 
@@ -142,10 +140,10 @@ it('can resolve a call a class method class with arguments and keyvalue args as 
     ]);
 
     expect($result)->sequence(
-        fn($e) => $e->toBeInstanceOf(SimpleClass::class),
-        fn($e) => $e->toBe(123),
-        fn($e) => $e->toBe('hi'),
-        fn($e) => $e->toBe('zzzz'),
+        fn ($e) => $e->toBeInstanceOf(SimpleClass::class),
+        fn ($e) => $e->toBe(123),
+        fn ($e) => $e->toBe('hi'),
+        fn ($e) => $e->toBe('zzzz'),
     );
 });
 
@@ -161,10 +159,10 @@ it('can resolve a call a class method class with arguments and keyvalue args as 
     ]);
 
     expect($result)->sequence(
-        fn($e) => $e->toBeInstanceOf(SimpleClass::class),
-        fn($e) => $e->toBe(123),
-        fn($e) => $e->toBe('hi'),
-        fn($e) => $e->toBe('zzzz'),
+        fn ($e) => $e->toBeInstanceOf(SimpleClass::class),
+        fn ($e) => $e->toBe(123),
+        fn ($e) => $e->toBe('hi'),
+        fn ($e) => $e->toBe('zzzz'),
     );
 });
 
