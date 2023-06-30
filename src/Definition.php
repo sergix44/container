@@ -51,7 +51,7 @@ class Definition
         if (is_callable($this->resolver)) {
             // resolve the callable, if the resolver is a callable
             $resolved = ($this->resolver)($container);
-        } elseif (is_string($resolved) && class_exists($resolved) && ! enum_exists($resolved)) {
+        } elseif (is_string($resolved) && class_exists($resolved) && !enum_exists($resolved)) {
             // if is a string (class concrete) and can be resolved via container
             $resolved = $container->get($resolved);
         } else {
