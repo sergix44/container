@@ -27,8 +27,7 @@ class Container implements ContainerInterface
     /**
      * @template T
      *
-     * @param class-string<T> $id
-     *
+     * @param  class-string<T>  $id
      * @return T
      *
      * @inheritDoc
@@ -127,14 +126,13 @@ class Container implements ContainerInterface
     }
 
     /**
-     * @param string $class
+     * @param  string  $class
+     * @return object|string|null
      *
      * @throws ContainerException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
-     *
-     * @return object|string|null
      */
     protected function resolve(string $class): object|string|null
     {
@@ -151,14 +149,13 @@ class Container implements ContainerInterface
     }
 
     /**
-     * @param ReflectionParameter[] $parameters
+     * @param  ReflectionParameter[]  $parameters
+     * @return array|null[]|object[]|string[]
      *
      * @throws ContainerException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
-     *
-     * @return array|null[]|object[]|string[]
      */
     protected function getArguments(array $parameters, $additional = []): array
     {
@@ -170,9 +167,9 @@ class Container implements ContainerInterface
             return match (true) {
                 $type !== null && $this->has($type)                          => $this->get($type), // via definitions
                 array_key_exists($param->getName(), $additional)             => $additional[$param->getName()], // defined by the user
-                !empty($positionalArgs)                                      => array_shift($positionalArgs),
+                ! empty($positionalArgs)                                      => array_shift($positionalArgs),
                 $param->isOptional()                                         => $param->getDefaultValue(), // use default when available
-                $type !== null && class_exists($type) && !enum_exists($type) => $this->resolve($type), // via reflection
+                $type !== null && class_exists($type) && ! enum_exists($type) => $this->resolve($type), // via reflection
                 default                                                      => throw ContainerException::parameterNotResolvable($param),
             };
         }, $parameters);
