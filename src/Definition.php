@@ -21,6 +21,7 @@ class Definition
     public function singleton(): static
     {
         $this->shared = true;
+
         return $this;
     }
 
@@ -47,7 +48,6 @@ class Definition
 
         $resolved = $this->resolver;
 
-
         if (is_callable($this->resolver)) {
             // resolve the callable, if the resolver is a callable
             $resolved = ($this->resolver)($container);
@@ -64,5 +64,4 @@ class Definition
 
         return $resolved;
     }
-
 }

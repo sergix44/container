@@ -77,14 +77,13 @@ it('throws error with an invalid definition', function () {
 
     $container->bind(SimpleInterface::class, 'stuff');
 
-   $container->get(SimpleInterface::class);
+    $container->get(SimpleInterface::class);
 })->expectException(ContainerException::class);
 
 it('throws error with unregistered definitions', function () {
     $container = new Container();
     $container->get(SimpleInterface::class);
 })->expectException(NotFoundException::class);
-
 
 it('can resolve a definition with constructor default parameters', function () {
     $container = new Container();
@@ -183,7 +182,6 @@ it('can resolve a simple definition via himself as delegator', function () {
     expect($container->has(SimpleInterface::class))->toBeTrue()
         ->and($container->get(SimpleInterface::class))->toBeInstanceOf(SimpleClass::class);
 });
-
 
 it('support abstract as string', function () {
     $container = new Container();
