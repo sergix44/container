@@ -2,21 +2,22 @@
 
 use Psr\Container\ContainerInterface;
 use SergiX44\Container\Container;
+use SergiX44\Container\Exception\ContainerException;
 use SergiX44\Container\Exception\NotFoundException;
-use SergiX44\Container\Tests\Fixtures\AbstractClass;
-use SergiX44\Container\Tests\Fixtures\ConcreteClass;
-use SergiX44\Container\Tests\Fixtures\MoreNestedClass;
-use SergiX44\Container\Tests\Fixtures\NestedClass;
-use SergiX44\Container\Tests\Fixtures\ResolvableClassWithDefault;
-use SergiX44\Container\Tests\Fixtures\SimpleClass;
-use SergiX44\Container\Tests\Fixtures\SimpleClassWithConstructor;
-use SergiX44\Container\Tests\Fixtures\SimpleInterface;
-use SergiX44\Container\Tests\Fixtures\UnresolvableClass;
+use SergiX44\Container\Tests\Fixtures\Resolve\AbstractClass;
+use SergiX44\Container\Tests\Fixtures\Resolve\ConcreteClass;
+use SergiX44\Container\Tests\Fixtures\Resolve\MoreNestedClass;
+use SergiX44\Container\Tests\Fixtures\Resolve\NestedClass;
+use SergiX44\Container\Tests\Fixtures\Resolve\ResolvableClassWithDefault;
+use SergiX44\Container\Tests\Fixtures\Resolve\SimpleClass;
+use SergiX44\Container\Tests\Fixtures\Resolve\SimpleClassWithConstructor;
+use SergiX44\Container\Tests\Fixtures\Resolve\SimpleInterface;
+use SergiX44\Container\Tests\Fixtures\Resolve\UnresolvableClass;
 
 it('can register a simple definition', function () {
     $container = new Container();
 
-    $container->register(SimpleInterface::class, SimpleClass::class);
+    $container->bind(SimpleInterface::class, SimpleClass::class);
 
     expect($container->has(SimpleInterface::class))->toBeTrue();
 });
@@ -24,7 +25,7 @@ it('can register a simple definition', function () {
 it('can resolve a simple definition', function () {
     $container = new Container();
 
-    $container->register(SimpleInterface::class, SimpleClass::class);
+    $container->bind(SimpleInterface::class, SimpleClass::class);
 
     expect($container->get(SimpleInterface::class))->toBeInstanceOf(SimpleClass::class);
 });
@@ -32,7 +33,7 @@ it('can resolve a simple definition', function () {
 it('can resolve a simple definition with abstract classes', function () {
     $container = new Container();
 
-    $container->register(AbstractClass::class, ConcreteClass::class);
+    $container->bind(AbstractClass::class, ConcreteClass::class);
 
     expect($container->get(AbstractClass::class))->toBeInstanceOf(ConcreteClass::class);
 });
@@ -40,7 +41,7 @@ it('can resolve a simple definition with abstract classes', function () {
 it('can resolve a nested class definition', function () {
     $container = new Container();
 
-    $container->register(SimpleInterface::class, SimpleClass::class);
+    $container->bind(SimpleInterface::class, SimpleClass::class);
 
     $instance = $container->get(NestedClass::class);
 
@@ -53,7 +54,7 @@ it('can resolve a nested class definition', function () {
 it('can resolve a definition with constructor', function () {
     $container = new Container();
 
-    $container->register(SimpleInterface::class, SimpleClass::class);
+    $container->bind(SimpleInterface::class, SimpleClass::class);
 
     $instance = $container->get(SimpleClassWithConstructor::class);
 
@@ -66,10 +67,18 @@ it('can resolve a definition with constructor', function () {
 it('throws error with unresolvable classes', function () {
     $container = new Container();
 
-    $container->register(SimpleInterface::class, SimpleClass::class);
+    $container->bind(SimpleInterface::class, SimpleClass::class);
 
     $container->get(UnresolvableClass::class);
 })->expectException(NotFoundException::class);
+
+it('throws error with an invalid definition', function () {
+    $container = new Container();
+
+    $container->bind(SimpleInterface::class, 'stuff');
+
+   $container->get(SimpleInterface::class);
+})->expectException(ContainerException::class);
 
 it('throws error with unregistered definitions', function () {
     $container = new Container();
@@ -79,7 +88,7 @@ it('throws error with unregistered definitions', function () {
 it('can resolve a definition with constructor default parameters', function () {
     $container = new Container();
 
-    $container->register(SimpleInterface::class, SimpleClass::class);
+    $container->bind(SimpleInterface::class, SimpleClass::class);
 
     $instance = $container->get(ResolvableClassWithDefault::class);
 
@@ -92,8 +101,8 @@ it('can resolve a definition with constructor default parameters', function () {
 it('can resolve a definition with a callable', function () {
     $container = new Container();
 
-    $container->register(SimpleInterface::class, SimpleClass::class);
-    $container->register(UnresolvableClass::class, function (ContainerInterface $container) {
+    $container->bind(SimpleInterface::class, SimpleClass::class);
+    $container->bind(UnresolvableClass::class, function (ContainerInterface $container) {
         return new UnresolvableClass($container->get(SimpleInterface::class), 12);
     });
 
@@ -109,9 +118,7 @@ it('can resolve a definition with a callable', function () {
 it('returns the same singleton definition', function () {
     $container = new Container();
 
-    $container
-        ->register(SimpleInterface::class, SimpleClass::class)
-        ->singleton();
+    $container->singleton(SimpleInterface::class, SimpleClass::class);
 
     $one = $container->get(SimpleInterface::class);
     $two = $container->get(SimpleInterface::class);
@@ -122,7 +129,7 @@ it('returns the same singleton definition', function () {
 it('returns different instances by default', function () {
     $container = new Container();
 
-    $container->register(SimpleInterface::class, SimpleClass::class);
+    $container->bind(SimpleInterface::class, SimpleClass::class);
 
     $one = $container->get(SimpleInterface::class);
     $two = $container->get(SimpleInterface::class);
@@ -154,7 +161,7 @@ it('can resolve a simple definition via delegator', function () {
 
     expect($container->has(SimpleInterface::class))->toBeFalse();
 
-    $container->delegateTo($delegator);
+    $container->delegate($delegator);
 
     expect($container->has(SimpleInterface::class))->toBeTrue()
         ->and($container->get(SimpleInterface::class))->toBeInstanceOf(SimpleClass::class);
@@ -162,7 +169,7 @@ it('can resolve a simple definition via delegator', function () {
 
 it('can resolve a simple definition via himself as delegator', function () {
     $delegator = new Container();
-    $delegator->register(SimpleInterface::class, SimpleClass::class);
+    $delegator->bind(SimpleInterface::class, SimpleClass::class);
 
     expect($delegator->has(SimpleInterface::class))->toBeTrue();
 
@@ -170,7 +177,7 @@ it('can resolve a simple definition via himself as delegator', function () {
 
     expect($container->has(SimpleInterface::class))->toBeFalse();
 
-    $container->delegateTo($delegator);
+    $container->delegate($delegator);
 
     expect($container->has(SimpleInterface::class))->toBeTrue()
         ->and($container->get(SimpleInterface::class))->toBeInstanceOf(SimpleClass::class);
@@ -179,7 +186,7 @@ it('can resolve a simple definition via himself as delegator', function () {
 it('support abstract as string', function () {
     $container = new Container();
 
-    $container->register('simple', SimpleClass::class);
+    $container->bind('simple', SimpleClass::class);
 
     expect($container->get('simple'))->toBeInstanceOf(SimpleClass::class);
 });
