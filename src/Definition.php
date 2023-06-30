@@ -48,18 +48,14 @@ class Definition
 
         $resolved = $this->resolver;
 
-        // resolve the callable, if the resolver is a callable
         if (is_callable($this->resolver)) {
+            // resolve the callable, if the resolver is a callable
             $resolved = ($this->resolver)($container);
-        }
-
-        // if is a string (class concrete) and can be resolved via container
-        if (is_string($resolved) && class_exists($resolved) && ! enum_exists($resolved)) {
+        } elseif (is_string($resolved) && class_exists($resolved) && !enum_exists($resolved)) {
+            // if is a string (class concrete) and can be resolved via container
             $resolved = $container->get($resolved);
-        }
-
-        if ($resolved === null) {
-            throw new ContainerException("Cannot resolve definition '$this->id'");
+        } else {
+            throw ContainerException::invalidDefinition($this->id);
         }
 
         if ($this->shared) {
