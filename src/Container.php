@@ -172,8 +172,10 @@ class Container implements ContainerInterface
 
             return match (true) {
                 $type !== null && $this->has($type) => $this->get($type), // via definitions
-                array_key_exists($param->getName(),
-                    $additional) => $additional[$param->getName()], // defined by the user
+                array_key_exists(
+                    $param->getName(),
+                    $additional
+                ) => $additional[$param->getName()], // defined by the user
                 !empty($positionalArgs) => array_shift($positionalArgs),
                 $param->isOptional() => $param->getDefaultValue(), // use default when available
                 $type !== null && class_exists($type) && !enum_exists($type) => $this->resolve($type), // via reflection
