@@ -54,7 +54,7 @@ class Definition
         }
 
         // if is a string (class concrete) and can be resolved via container
-        if (is_string($resolved) && class_exists($resolved) && !enum_exists($resolved)) {
+        if (is_string($resolved) && class_exists($resolved) && ! enum_exists($resolved)) {
             $resolved = $container->get($resolved);
         }
 
