@@ -13,7 +13,7 @@
     "vimeo/psalm": "^5.13"
   },
   "provide": {
-    "psr/container-implementation": "^1.0|^2.0"
+    "psr/container-implementation": "^1.1|^2.0"
   },
   "license": "MIT",
   "autoload": {
