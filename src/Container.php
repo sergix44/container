@@ -39,12 +39,12 @@ class Container implements ContainerInterface
      */
     public function get(string $id)
     {
-        if ($this->delegate !== null && $this->delegate->has($id)) {
-            return $this->delegate->get($id);
-        }
-
         if (array_key_exists($id, $this->definitions)) {
             return $this->definitions[$id]?->make($this);
+        }
+
+        if ($this->delegate !== null && $this->delegate->has($id)) {
+            return $this->delegate->get($id);
         }
 
         try {
@@ -59,13 +59,13 @@ class Container implements ContainerInterface
      */
     public function has(string $id): bool
     {
-        // check if the delegate can resolve it, if defined
-        if ($this->delegate !== null && $this->delegate->has($id)) {
+        // check if is something we match right away
+        if (array_key_exists($id, $this->definitions)) {
             return true;
         }
 
-        // check if is something we match right away
-        if (array_key_exists($id, $this->definitions)) {
+        // check if the delegate can resolve it, if defined
+        if ($this->delegate !== null && $this->delegate->has($id)) {
             return true;
         }
 
