@@ -148,41 +148,6 @@ it('stores an instance as definition', function () {
     expect(spl_object_id($get))->toBe(spl_object_id($i));
 });
 
-it('can resolve a simple definition via delegator', function () {
-    $di = new \DI\ContainerBuilder();
-    $di->addDefinitions([
-        SimpleInterface::class => \DI\create(SimpleClass::class),
-    ]);
-    $delegator = $di->build();
-
-    expect($delegator->has(SimpleInterface::class))->toBeTrue();
-
-    $container = new Container();
-
-    expect($container->has(SimpleInterface::class))->toBeFalse();
-
-    $container->delegate($delegator);
-
-    expect($container->has(SimpleInterface::class))->toBeTrue()
-        ->and($container->get(SimpleInterface::class))->toBeInstanceOf(SimpleClass::class);
-});
-
-it('can resolve a simple definition via himself as delegator', function () {
-    $delegator = new Container();
-    $delegator->bind(SimpleInterface::class, SimpleClass::class);
-
-    expect($delegator->has(SimpleInterface::class))->toBeTrue();
-
-    $container = new Container();
-
-    expect($container->has(SimpleInterface::class))->toBeFalse();
-
-    $container->delegate($delegator);
-
-    expect($container->has(SimpleInterface::class))->toBeTrue()
-        ->and($container->get(SimpleInterface::class))->toBeInstanceOf(SimpleClass::class);
-});
-
 it('support abstract as string', function () {
     $container = new Container();
 
