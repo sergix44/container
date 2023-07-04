@@ -32,7 +32,7 @@ class Container implements ContainerInterface
     /**
      * @template T
      *
-     * @param class-string<T> $id
+     * @param  class-string<T>  $id
      * @return T
      *
      * @inheritDoc
@@ -132,7 +132,7 @@ class Container implements ContainerInterface
     }
 
     /**
-     * @param string $class
+     * @param  string  $class
      * @return object|string|null
      *
      * @throws ContainerException
@@ -155,7 +155,7 @@ class Container implements ContainerInterface
     }
 
     /**
-     * @param ReflectionParameter[] $parameters
+     * @param  ReflectionParameter[]  $parameters
      * @return array|null[]|object[]|string[]
      *
      * @throws ContainerException
@@ -167,20 +167,29 @@ class Container implements ContainerInterface
     {
         $positionalArgs = array_filter($additional, 'is_numeric', ARRAY_FILTER_USE_KEY);
 
-        return array_map(function (ReflectionParameter $param) use (&$additional, &$positionalArgs) {
+        $resolved = [];
+        foreach ($parameters as $param) {
             $type = $param->getType()?->getName();
 
-            return match (true) {
+            // variadic parameters can only be the last one
+            if ($param->isVariadic()) {
+                $resolved = array_merge($resolved, $additional[$param->getName()] ?? $positionalArgs);
+                break;
+            }
+
+            $resolved[] = match (true) {
                 $type !== null && $this->has($type) => $this->get($type), // via definitions
                 array_key_exists(
                     $param->getName(),
                     $additional
                 ) => $additional[$param->getName()], // defined by the user
                 !empty($positionalArgs) => array_shift($positionalArgs),
-                $param->isOptional() => $param->getDefaultValue(), // use default when available
+                $param->isOptional() && $param->isDefaultValueAvailable() => $param->getDefaultValue(), // use default when available
                 $type !== null && class_exists($type) && !enum_exists($type) => $this->resolve($type), // via reflection
                 default => throw ContainerException::parameterNotResolvable($param),
             };
-        }, $parameters);
+        }
+
+        return $resolved;
     }
 }

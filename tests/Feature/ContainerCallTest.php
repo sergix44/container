@@ -177,3 +177,35 @@ it('throws an error with invalid exception', function () {
         'z' => 'zzzz',
     ]);
 })->expectException(ContainerException::class);
+
+it('can resolve a call a closure with arguments and variadic', function () {
+    $container = new Container();
+    $container->bind(SimpleInterface::class, SimpleClass::class);
+
+    $f = function (SimpleInterface $simple, string ...$z) {
+        return [$simple, $z];
+    };
+
+    $result = $container->call($f, ['eee', 'aaa', 'zzz']);
+
+    expect($result)->sequence(
+        fn ($e) => $e->toBeInstanceOf(SimpleClass::class),
+        fn ($e) => $e->toBe(['eee', 'aaa', 'zzz']),
+    );
+});
+
+it('can resolve a call a closure with arguments and no variadic', function () {
+    $container = new Container();
+    $container->bind(SimpleInterface::class, SimpleClass::class);
+
+    $f = function (SimpleInterface $simple, string ...$z) {
+        return [$simple, $z];
+    };
+
+    $result = $container->call($f);
+
+    expect($result)->sequence(
+        fn ($e) => $e->toBeInstanceOf(SimpleClass::class),
+        fn ($e) => $e->toBe([]),
+    );
+});
