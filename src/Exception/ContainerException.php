@@ -15,7 +15,7 @@ class ContainerException extends Exception implements ContainerExceptionInterfac
 
     public static function parameterNotResolvable(ReflectionParameter $param): self
     {
-        return new self("Cannot resolve constructor parameter '\${$param->getName()}::{$param->getDeclaringClass()?->getName()}'");
+        return new self("Cannot resolve parameter '\${$param->getName()}::{$param->getDeclaringClass()?->getName()}'");
     }
 
     public static function invalidCallable(): self
