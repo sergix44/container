@@ -203,9 +203,61 @@ it('can resolve a definition with input arguments', function () {
         return new ValueClass($value);
     });
 
-    $instance = $container->get(ValueClass::class, 'test');
+    $instance = $container->make(ValueClass::class, ['test']);
 
     expect($instance)
         ->toBeInstanceOf(ValueClass::class)
         ->and($instance->getValue())->toBe('test');
+});
+
+it('can resolve a singleton definition with input arguments', function () {
+    $container = new Container();
+
+    $container->singleton(ValueClass::class, function (ContainerInterface $container, string $value) {
+        return new ValueClass($value);
+    });
+
+    $instance = $container->make(ValueClass::class, ['test']);
+
+    $instance2 = $container->make(ValueClass::class, ['test2']);
+
+    expect($instance)
+        ->toBeInstanceOf(ValueClass::class)
+        ->and($instance->getValue())->toBe('test')
+        ->and($instance2->getValue())->toBe('test');
+});
+
+it('can refresh a singleton definition with input arguments', function () {
+    $container = new Container();
+
+    $container->singleton(ValueClass::class, function (ContainerInterface $container, string $value) {
+        return new ValueClass($value);
+    });
+
+    $instance = $container->make(ValueClass::class, ['test']);
+    $instance2 = $container->make(ValueClass::class, ['test2'], true);
+
+    expect($instance)
+        ->toBeInstanceOf(ValueClass::class)
+        ->and($instance->getValue())->toBe('test')
+        ->and($instance2->getValue())->toBe('test2');
+});
+
+it('can forget a singleton definition with input arguments', function () {
+    $container = new Container();
+
+    $container->singleton(ValueClass::class, function (ContainerInterface $container, string $value) {
+        return new ValueClass($value);
+    });
+
+    $instance = $container->make(ValueClass::class, ['test']);
+
+    $container->forget(ValueClass::class);
+
+    $instance2 = $container->make(ValueClass::class, ['test2']);
+
+    expect($instance)
+        ->toBeInstanceOf(ValueClass::class)
+        ->and($instance->getValue())->toBe('test')
+        ->and($instance2->getValue())->toBe('test2');
 });

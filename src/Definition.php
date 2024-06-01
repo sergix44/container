@@ -30,7 +30,7 @@ class Definition
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface|\ReflectionException
      */
-    public function make(ContainerInterface $container, array $args = []): mixed
+    public function make(ContainerInterface $container, array $arguments = []): mixed
     {
         if ($this->instance !== null) {
             return $this->instance;
@@ -40,7 +40,7 @@ class Definition
 
         // resolve the callable, if the resolver is a callable
         if (is_callable($resolved)) {
-            $resolved = $resolved($container, ...$args);
+            $resolved = $resolved($container, ...$arguments);
         }
 
         // if is a string (class concrete) and can be resolved via container
@@ -57,5 +57,12 @@ class Definition
         }
 
         return $resolved;
+    }
+
+    public function clear(): static
+    {
+        $this->instance = null;
+
+        return $this;
     }
 }
