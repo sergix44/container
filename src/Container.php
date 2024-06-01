@@ -33,14 +33,15 @@ class Container implements ContainerInterface
      * @template T
      *
      * @param  class-string<T>  $id
+     * @param mixed  $resolverArgs
      * @return T
      *
      * @inheritDoc
      */
-    public function get(string $id)
+    public function get(string $id, mixed ...$resolverArgs)
     {
         if (array_key_exists($id, $this->definitions)) {
-            return $this->definitions[$id]?->make($this);
+            return $this->definitions[$id]?->make($this, $resolverArgs);
         }
 
         if ($this->delegate !== null && $this->delegate->has($id)) {

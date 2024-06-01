@@ -15,6 +15,7 @@ use SergiX44\Container\Tests\Fixtures\Resolve\SimpleClass;
 use SergiX44\Container\Tests\Fixtures\Resolve\SimpleClassWithConstructor;
 use SergiX44\Container\Tests\Fixtures\Resolve\SimpleInterface;
 use SergiX44\Container\Tests\Fixtures\Resolve\UnresolvableClass;
+use SergiX44\Container\Tests\Fixtures\Resolve\ValueClass;
 
 it('can register a simple definition', function () {
     $container = new Container();
@@ -193,4 +194,18 @@ it('support set as string', function () {
     $container->set('simple', $i);
 
     expect($container->get('simple'))->toBe($i);
+});
+
+it('can resolve a definition with input arguments', function () {
+    $container = new Container();
+
+    $container->bind(ValueClass::class, function (ContainerInterface $container, string $value) {
+        return new ValueClass($value);
+    });
+
+    $instance = $container->get(ValueClass::class, 'test');
+
+    expect($instance)
+        ->toBeInstanceOf(ValueClass::class)
+        ->and($instance->getValue())->toBe('test');
 });
