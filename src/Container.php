@@ -107,7 +107,7 @@ class Container implements ContainerInterface
             if (is_string($callable[0]) && class_exists($callable[0])) {
                 $callable[0] = $this->get($callable[0]);
             }
-            if (method_exists(...$callable)) {
+            if (method_exists($callable[0], $callable[1])) {
                 $method = new ReflectionMethod(...$callable);
             }
         } elseif ($callable instanceof Closure || (is_string($callable) && function_exists($callable))) {
