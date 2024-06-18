@@ -6,6 +6,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SergiX44\Container\Exception\ContainerException;
+use Throwable;
 
 class Definition
 {
@@ -45,11 +46,11 @@ class Definition
 
         // if is a string (class concrete) and can be resolved via container
         if (is_string($resolved) && class_exists($resolved) && !enum_exists($resolved)) {
-            $resolved = $container->get($resolved);
-        }
-
-        if (!is_object($resolved)) {
-            throw ContainerException::invalidDefinition($this->id);
+            try {
+                $resolved = $container->get($resolved);
+            } catch (Throwable $e) {
+                throw ContainerException::cannotSolveDefinition($this->id, $e);
+            }
         }
 
         if ($this->shared) {

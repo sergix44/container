@@ -8,9 +8,9 @@ use ReflectionParameter;
 
 class ContainerException extends Exception implements ContainerExceptionInterface
 {
-    public static function invalidDefinition(string $id): self
+    public static function cannotSolveDefinition(string $id, ?\Throwable $e = null): self
     {
-        return new self("Cannot resolve definition '$id'");
+        return new self("Cannot resolve definition '$id'", previous: $e);
     }
 
     public static function parameterNotResolvable(ReflectionParameter $param): self

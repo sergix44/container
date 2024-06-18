@@ -2,7 +2,6 @@
 
 use Psr\Container\ContainerInterface;
 use SergiX44\Container\Container;
-use SergiX44\Container\Exception\ContainerException;
 use SergiX44\Container\Exception\NotFoundException;
 use SergiX44\Container\Tests\Fixtures\Resolve\AbstractClass;
 use SergiX44\Container\Tests\Fixtures\Resolve\ConcreteClass;
@@ -68,6 +67,33 @@ it('can resolve a definition with constructor', function () {
         ->toBeInstanceOf(SimpleClass::class);
 });
 
+it('can resolve a scalar definitions', function () {
+    $container = new Container();
+
+    $container->bind('something', fn() => 12);
+    $container->bind('something2', fn() => 'aaa');
+    $container->bind('something3', fn() => ['bbb']);
+
+
+    $instance1 = $container->get('something');
+    $instance2 = $container->get('something2');
+    $instance3 = $container->get('something3');
+
+    expect($instance1)->toBe(12)
+        ->and($instance2)->toBe('aaa')
+        ->and($instance3)->toBe(['bbb']);
+});
+
+it('works with null definitions', function () {
+    $container = new Container();
+
+    $container->bind(SimpleInterface::class, fn() => null);
+
+    $i = $container->get(SimpleInterface::class);
+
+    expect($i)->toBeNull();
+});
+
 it('throws error with unresolvable classes', function () {
     $container = new Container();
 
@@ -75,14 +101,6 @@ it('throws error with unresolvable classes', function () {
 
     $container->get(UnresolvableClass::class);
 })->expectException(NotFoundException::class);
-
-it('throws error with an invalid definition', function () {
-    $container = new Container();
-
-    $container->bind(SimpleInterface::class, 'stuff');
-
-    $container->get(SimpleInterface::class);
-})->expectException(ContainerException::class);
 
 it('throws error with unregistered definitions', function () {
     $container = new Container();
