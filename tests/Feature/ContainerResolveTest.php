@@ -70,9 +70,9 @@ it('can resolve a definition with constructor', function () {
 it('can resolve a scalar definitions', function () {
     $container = new Container();
 
-    $container->bind('something', fn() => 12);
-    $container->bind('something2', fn() => 'aaa');
-    $container->bind('something3', fn() => ['bbb']);
+    $container->bind('something', fn () => 12);
+    $container->bind('something2', fn () => 'aaa');
+    $container->bind('something3', fn () => ['bbb']);
 
 
     $instance1 = $container->get('something');
@@ -87,7 +87,7 @@ it('can resolve a scalar definitions', function () {
 it('works with null definitions', function () {
     $container = new Container();
 
-    $container->bind(SimpleInterface::class, fn() => null);
+    $container->bind(SimpleInterface::class, fn () => null);
 
     $i = $container->get(SimpleInterface::class);
 
